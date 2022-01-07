@@ -1,0 +1,3 @@
+INSERT INTO TB_CATEGORY (name) VALUES ('Livros');
+INSERT INTO TB_CATEGORY (name) VALUES ('Escritório');
+INSERT INTO TB_CATEGORY (name) VALUES ('Celulares');
