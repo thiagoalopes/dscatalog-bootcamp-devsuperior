@@ -3,6 +3,8 @@ package br.dev.thiagoalopes.dscatalog.services;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,5 +37,23 @@ public class CategoryService {
 		
 		return new CategoryDTO(this.categoryRepository
 				.save(new Category(null, categoryDTO.getName())));
+	}
+	
+	@Transactional
+	public CategoryDTO update(Long id, CategoryDTO categoryDTO) {
+		
+		Category category = null;
+		
+		try {
+			
+			category = this.categoryRepository.getById(id);
+			category.setName(categoryDTO.getName());
+			category = this.categoryRepository.save(category);
+			
+			return new CategoryDTO(category);
+			
+		} catch (EntityNotFoundException e) {
+			throw new ResourceNotFoundException("Resource not found", e);
+		}
 	}
 }
