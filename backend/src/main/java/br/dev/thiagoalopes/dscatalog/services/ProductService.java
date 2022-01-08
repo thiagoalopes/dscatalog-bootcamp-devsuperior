@@ -10,8 +10,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.dev.thiagoalopes.dscatalog.dto.CategoryDTO;
 import br.dev.thiagoalopes.dscatalog.dto.ProductDTO;
+import br.dev.thiagoalopes.dscatalog.entities.Category;
 import br.dev.thiagoalopes.dscatalog.entities.Product;
+import br.dev.thiagoalopes.dscatalog.repositories.CategoryRepository;
 import br.dev.thiagoalopes.dscatalog.repositories.ProductRepository;
 import br.dev.thiagoalopes.dscatalog.services.exceptions.DatabaseException;
 import br.dev.thiagoalopes.dscatalog.services.exceptions.ResourceNotFoundException;
@@ -21,6 +24,9 @@ public class ProductService {
 
 	@Autowired
 	private ProductRepository productRepository;
+	
+	@Autowired
+	private CategoryRepository categoryRepository;
 	
 	@Transactional(readOnly = true)
 	public Page<ProductDTO> findAll(PageRequest pageRequest) {
@@ -39,12 +45,11 @@ public class ProductService {
 	@Transactional
 	public ProductDTO store(ProductDTO productDTO) {
 		
+		Product product = new Product();
+		this.copyDtoToEntity(productDTO, product);
+		
 		return new ProductDTO(this.productRepository
-				.save(new Product(null, productDTO.getName(),
-						productDTO.getDescription(),
-						productDTO.getPrice(),
-						productDTO.getImgUrl(),
-						productDTO.getDate())));
+				.save(product));
 	}
 	
 	@Transactional
@@ -56,12 +61,8 @@ public class ProductService {
 			
 			product = this.productRepository.getById(id);
 			
-			product.setName(productDTO.getName());
-			product.setDescription(productDTO.getDescription());
-			product.setPrice(productDTO.getPrice());
-			product.setImgUrl(productDTO.getImgUrl());
-			product.setDate(productDTO.getDate());
-			
+			this.copyDtoToEntity(productDTO, product);
+
 			product = this.productRepository.save(product);
 			
 			return new ProductDTO(product);
@@ -81,6 +82,22 @@ public class ProductService {
 			
 		} catch (DataIntegrityViolationException e) {
 			throw new DatabaseException("", e);
+		}
+	}
+	
+	private void copyDtoToEntity(ProductDTO productDTO, Product product) {
+		
+		product.setName(productDTO.getName());
+		product.setDescription(productDTO.getDescription());
+		product.setPrice(productDTO.getPrice());
+		product.setImgUrl(productDTO.getImgUrl());
+		product.setDate(productDTO.getDate());
+		
+		product.getCategories().clear();
+		
+		for (CategoryDTO categoryDTO : productDTO.getCategories()) {
+			Category category = this.categoryRepository.getById(categoryDTO.getId());
+			product.getCategories().add(category);
 		}
 	}
 	

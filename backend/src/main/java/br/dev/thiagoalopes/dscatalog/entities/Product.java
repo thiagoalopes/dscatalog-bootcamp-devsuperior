@@ -2,6 +2,7 @@ package br.dev.thiagoalopes.dscatalog.entities;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -42,7 +43,7 @@ public class Product implements Serializable {
 			joinColumns = @JoinColumn(name = "product_id"),
 			inverseJoinColumns = @JoinColumn(name = "category_id" )
 			)
-	Set<Category> categories;
+	Set<Category> categories = new HashSet<>();
 	
 	@Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
 	private Instant createdAt;
