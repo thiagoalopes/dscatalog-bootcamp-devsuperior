@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import br.dev.thiagoalopes.dscatalog.services.exceptions.DatabaseException;
 import br.dev.thiagoalopes.dscatalog.services.exceptions.ResourceNotFoundException;
@@ -44,7 +45,39 @@ public class ResourceExceptionHandler {
 					request.getRequestURI()
 				);
 		
-		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(error);
+	}
+	
+	@ExceptionHandler(ResourceArgumentException.class)
+	public ResponseEntity<StandardError> resourceArgumentException(
+			ResourceArgumentException e, HttpServletRequest request, HttpServletResponse response) {
+		
+		StandardError error = new StandardError(
+					Instant.now(),
+					HttpStatus.BAD_REQUEST.value(),
+					"Argument Exception",
+					e.getCause().getMessage(),
+					request.getRequestURI()
+				);
+		
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(error);
+	}
+	
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<StandardError> methodArgumentTypeMismatchException(
+			MethodArgumentTypeMismatchException e, HttpServletRequest request, HttpServletResponse response) {
+		
+		StandardError error = new StandardError(
+					Instant.now(),
+					HttpStatus.BAD_REQUEST.value(),
+					"Argument Exception",
+					e.getCause().getMessage(),
+					request.getRequestURI()
+				);
+		
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 				.body(error);
 	}
 }

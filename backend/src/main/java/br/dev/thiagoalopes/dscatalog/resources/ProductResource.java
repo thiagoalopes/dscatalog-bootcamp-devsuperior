@@ -18,19 +18,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import br.dev.thiagoalopes.dscatalog.dto.CategoryDTO;
+import br.dev.thiagoalopes.dscatalog.dto.ProductDTO;
 import br.dev.thiagoalopes.dscatalog.resources.exceptions.ResourceArgumentException;
-import br.dev.thiagoalopes.dscatalog.services.CategoryService;
+import br.dev.thiagoalopes.dscatalog.services.ProductService;
 
 @RestController
-@RequestMapping("categories")
-public class CategoryResource {
+@RequestMapping("products")
+public class ProductResource {
 
 	@Autowired
-	private CategoryService categoryService;
+	private ProductService productService;
 	
 	@GetMapping
-	public ResponseEntity<Page<CategoryDTO>> findAll(
+	public ResponseEntity<Page<ProductDTO>> findAll(
 			@RequestParam(value = "page", defaultValue = "0") Integer page,
 			@RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage,
 			@RequestParam(value = "orderBy", defaultValue = "name") String orderBy,
@@ -41,39 +41,38 @@ public class CategoryResource {
 			PageRequest pageRequest = PageRequest
 					.of(page, linesPerPage, Direction.valueOf(direction), orderBy);
 			
-			return ResponseEntity.ok(this.categoryService.findAll(pageRequest));
+			return ResponseEntity.ok(this.productService.findAll(pageRequest));
 		} catch (IllegalArgumentException e) {
 			throw new ResourceArgumentException("Wrong argument", e);
 		}
 		
-		
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<CategoryDTO> findById(@PathVariable Long id) {
-		return ResponseEntity.ok(this.categoryService.findById(id));
+	public ResponseEntity<ProductDTO> findById(@PathVariable Long id) {
+		return ResponseEntity.ok(this.productService.findById(id));
 	}
 	
 	@PostMapping
-	public ResponseEntity<CategoryDTO> store(@RequestBody CategoryDTO categoryDTO) {
+	public ResponseEntity<ProductDTO> store(@RequestBody ProductDTO ProductDTO) {
 		
-		categoryDTO = this.categoryService.store(categoryDTO);
+		ProductDTO = this.productService.store(ProductDTO);
 		
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-				.path("/{id}").buildAndExpand(categoryDTO.getId()).toUri();
+				.path("/{id}").buildAndExpand(ProductDTO.getId()).toUri();
 
 		return ResponseEntity.created(uri)
-				.body(categoryDTO);
+				.body(ProductDTO);
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<CategoryDTO> store(@PathVariable Long id, @RequestBody CategoryDTO categoryDTO) {
-		return ResponseEntity.ok(this.categoryService.update(id, categoryDTO));
+	public ResponseEntity<ProductDTO> store(@PathVariable Long id, @RequestBody ProductDTO ProductDTO) {
+		return ResponseEntity.ok(this.productService.update(id, ProductDTO));
 	}
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> store(@PathVariable Long id) {
-		this.categoryService.delete(id);
+		this.productService.delete(id);
 		return ResponseEntity.noContent().build();
 	}
 }
